@@ -4,5 +4,5 @@
  */
 
 exports.index = function(req, res){
-  res.render('index', { title: 'Express deployed from Could9' });
+  res.render('index', { title: 'Express deployed from Could9', items: doc });
 };
