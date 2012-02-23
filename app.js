@@ -35,7 +35,8 @@ var host = 'https://goodmike.cloudant.com'
   , port = 443
   , dbname   = dev ? 'grade_tracker_proto_dev'  : process.env.CDB_NAME || 'grade_tracker_proto_dev'
   , username = dev ? 'bypargatedectlesessightn' : process.env.CDB_USER || 'bypargatedectlesessightn'
-  , password = dev ? 'lW7dwdGelNiKyQEE3007Fdsj' : process.env.CDB_PASSWD || 'lW7dwdGelNiKyQEE3007Fdsj';
+  , password = dev ? 'lW7dwdGelNiKyQEE3007Fdsj' : process.env.CDB_PASSWD || 'lW7dwdGelNiKyQEE3007Fdsj'
+  , viewPath = '_design/basic/_view/';
 
 var credentials = {'username': username, 'password': password };
 var db = new(cradle.Connection)(host, port, {auth: credentials}).database(dbname);
@@ -43,7 +44,21 @@ var db = new(cradle.Connection)(host, port, {auth: credentials}).database(dbname
 
 // Routes
 
-app.get('/', routes.index);
+// app.get('/', routes.index);
+app.get('/', function(req,res) {
+//    var options = {
+//        descending: true
+//    };
+    db.get('_design/basic/_view/ping', function(err,doc) {
+       for (var key in err) {
+           console.log("err[" + key + "]: " + err[key]);
+       };
+       res.render('index', {
+          title: 'Express deployed from Could9',
+          items: doc
+       });
+   });
+});
 
 port = process.env.C9_PORT || process.env.PORT || 3000;
 app.listen(port);
