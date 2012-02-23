@@ -3,7 +3,8 @@
  * Module dependencies.
  */
 
-var express = require('express')
+var cradle = require('cradle')
+  , express = require('express')
   , routes = require('./routes')
 
 var app = module.exports = express.createServer();
@@ -26,6 +27,19 @@ app.configure('development', function(){
 app.configure('production', function(){
   app.use(express.errorHandler()); 
 });
+
+var dev = true;
+
+// for couch
+var host = 'https://goodmike.cloudant.com'
+  , port = 443
+  , dbname   = dev ? 'grade_tracker_proto_dev'  : process.env.CDB_NAME || 'grade_tracker_proto_dev'
+  , username = dev ? 'bypargatedectlesessightn' : process.env.CDB_USER || 'bypargatedectlesessightn'
+  , password = dev ? 'lW7dwdGelNiKyQEE3007Fdsj' : process.env.CDB_PASSWD || 'lW7dwdGelNiKyQEE3007Fdsj';
+
+var credentials = {'username': username, 'password': password };
+var db = new(cradle.Connection)(host, port, {auth: credentials}).database(dbname);
+
 
 // Routes
 
