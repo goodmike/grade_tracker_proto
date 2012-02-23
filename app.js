@@ -30,6 +30,7 @@ app.configure('production', function(){
 // Routes
 
 app.get('/', routes.index);
-port = process.env.PORT || process.env.PORT || 3000;
+
+port = process.env.C9_PORT || process.env.PORT || 3000;
 app.listen(port);
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
