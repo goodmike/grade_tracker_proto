@@ -2,9 +2,9 @@
     "_id": "_design/microblog",
     "views" : { 
         "ping": {
-            "map": function(doc) {
-                if (doc._id == 'ping') { emit(doc_id, doc.message): } 
-            }
+            "map": "function(doc) {
+                if (doc._id == 'ping') { emit(doc_id, doc.message); } 
+            }"
         }
     }
 
