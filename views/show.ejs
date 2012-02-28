@@ -1,0 +1,10 @@
+<h1><%= title %></h1>
+
+<p>Dates First</p>
+<ul>
+<% for(var i=0; i < doc.rows.length; i++) {%>
+   <li><%= doc.rows[i].date %></li>
+<% } %>
+</ul>
+
+<div id="data_doc">This is where the data doc JSON will display.</div>

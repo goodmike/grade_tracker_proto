@@ -45,20 +45,8 @@ var db = new(cradle.Connection)(host, port, {auth: credentials}).database(dbname
 // Routes
 
 // app.get('/', routes.index);
-app.get('/', function(req,res) {
-//    var options = {
-//        descending: true
-//    };
-    db.get('_design/basic/_view/ping', function(err,doc) {
-       for (var key in err) {
-           console.log("err[" + key + "]: " + err[key]);
-       };
-       res.render('index', {
-          title: 'Express deployed from Could9',
-          items: doc
-       });
-   });
-});
+app.get('/', routes.index(db));
+app.get('/tracker', routes.show(db));
 
 port = process.env.C9_PORT || process.env.PORT || 3000;
 app.listen(port);
