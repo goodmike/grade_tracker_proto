@@ -46,7 +46,15 @@ var db = new(cradle.Connection)(host, port, {auth: credentials}).database(dbname
 
 // app.get('/', routes.index);
 app.get('/', routes.index(db));
-app.get('/tracker', routes.show(db));
+// app.get('/tracker', routes.show(db));
+app.get('/tracker', function(req,res) {
+    db.get('_design/basic/_view/scores', function(err,doc) {
+        res.render('show', {
+            title: 'Grade Tracker',
+            items: doc
+        });
+    });
+});
 
 port = process.env.C9_PORT || process.env.PORT || 3000;
 app.listen(port);

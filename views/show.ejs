@@ -2,9 +2,41 @@
 
 <p>Dates First</p>
 <ul>
-<% for(var i=0; i < doc.rows.length; i++) {%>
-   <li><%= doc.rows[i].date %></li>
+<% for(var i=0; i < items.length; i++) {
+   var grade = items[i].value %>
+   <li><%= grade.date %></li>
 <% } %>
 </ul>
+
+<!-- Example
+{"id":"68ed2c9f8457e4054ac82f756d5ea541","key":"2012-02-01",
+ "value": {"_id":"68ed2c9f8457e4054ac82f756d5ea541",
+           "_rev":"1-f1bd42e707e23ad4563cca8481f15e7c","type":"score",
+           "topic":"Section 8.1","assessment":"homework",
+           "score":"100","notes":"","date":"2012-02-01"}}
+
+<p>Data Table</p>
+<table>
+<tr>
+    <th>Date</th>
+    <th>Assessment</th>
+    <th>Topic</th>
+    <th>Score</th>
+    <th>Weight</th>
+    <th>Weighted Score</th>
+    <th>Notes</th>
+</tr>
+<% for(var i=0; i < items.length; i++) {
+   var grade = items[i].value %>
+<tr><td><%= grade.date %><td>
+    <td>grade.assessment</td>
+    <td>grade.topic</td>
+    <td>grade.score</td>
+    <td>Weight TBD</td>
+    <td>Weighted Score TBD</td>
+    <td>grade.notes</td>
+</tr>
+<% } %>
+</table>
 
 <div id="data_doc">This is where the data doc JSON will display.</div>
