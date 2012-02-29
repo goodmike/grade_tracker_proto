@@ -48,10 +48,32 @@ var db = new(cradle.Connection)(host, port, {auth: credentials}).database(dbname
 app.get('/', routes.index(db));
 // app.get('/tracker', routes.show(db));
 app.get('/tracker', function(req,res) {
-    db.get('_design/basic/_view/scores', function(err,doc) {
+    db.get('_design/basic/_view/grades_and_weights', function(err,doc) {
+        var rows = doc.rows;
+        var weights = {};
+        var grades = [];
+        console.log("rows.length: " + rows.length);
+        for (var i=0; i<rows.length; i++) {
+            var date = rows[i].key[0];
+            if (date === 0) {
+                console.log("date === 0");
+                var assessment = rows[i].key[1];
+                var weight = parseInt(rows[i].value.weight, 10);
+                weights[assessment] = weight;
+            } else {
+                grades.push(rows[i].value);   
+            }
+        }
+        console.log(weights);
+        for (var i=0; i<grades.length; i++) {
+            var grade = grades[i];
+            grade.weight = weights[grade.assessment];
+            grade.score = parseInt(grade.score, 10);
+            grade.weighted_score = grade.weight * grade.score;
+        }
         res.render('show', {
             title: 'Grade Tracker',
-            items: doc
+            items: grades
         });
     });
 });

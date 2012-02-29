@@ -3,7 +3,7 @@
 <p>Dates First</p>
 <ul>
 <% for(var i=0; i < items.length; i++) {
-   var grade = items[i].value %>
+   var grade = items[i] %>
    <li><%= grade.date %></li>
 <% } %>
 </ul>
@@ -14,9 +14,17 @@
            "_rev":"1-f1bd42e707e23ad4563cca8481f15e7c","type":"score",
            "topic":"Section 8.1","assessment":"homework",
            "score":"100","notes":"","date":"2012-02-01"}}
+-->
 
 <p>Data Table</p>
 <table>
+<col class="date">
+<col class="assessment">
+<col class="topic">
+<col class="score">
+<col class="weight">
+<col class="weighted_score">
+<col class="notes">
 <tr>
     <th>Date</th>
     <th>Assessment</th>
@@ -27,14 +35,15 @@
     <th>Notes</th>
 </tr>
 <% for(var i=0; i < items.length; i++) {
-   var grade = items[i].value %>
-<tr><td><%= grade.date %><td>
-    <td>grade.assessment</td>
-    <td>grade.topic</td>
-    <td>grade.score</td>
-    <td>Weight TBD</td>
-    <td>Weighted Score TBD</td>
-    <td>grade.notes</td>
+   var grade = items[i] %>
+<tr>
+    <td><%= grade.date %></td>
+    <td><%= grade.assessment %></td>
+    <td><%= grade.topic %></td>
+    <td><%= grade.score %></td>
+    <td><%= grade.weight %></td>
+    <td><%= grade.weighted_score %></td>
+    <td><%= grade.notes %></td>
 </tr>
 <% } %>
 </table>
