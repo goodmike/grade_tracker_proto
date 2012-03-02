@@ -56,7 +56,6 @@ app.get('/tracker', function(req,res) {
         for (var i=0; i<rows.length; i++) {
             var date = rows[i].key[0];
             if (date === 0) {
-                console.log("date === 0");
                 var assessment = rows[i].key[1];
                 var weight = parseInt(rows[i].value.weight, 10);
                 weights[assessment] = weight;
@@ -64,7 +63,6 @@ app.get('/tracker', function(req,res) {
                 grades.push(rows[i].value);   
             }
         }
-        console.log(weights);
         for (var i=0; i<grades.length; i++) {
             var grade = grades[i];
             grade.weight = weights[grade.assessment];

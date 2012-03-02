@@ -15,37 +15,36 @@
            "topic":"Section 8.1","assessment":"homework",
            "score":"100","notes":"","date":"2012-02-01"}}
 -->
-
+<div id="grades">
 <p>Data Table</p>
-<table>
+<table class="all">
 <col class="date">
 <col class="assessment">
-<col class="topic">
+<col class="details_link">
 <col class="score">
 <col class="weight">
 <col class="weighted_score">
-<col class="notes">
 <tr>
     <th>Date</th>
     <th>Assessment</th>
-    <th>Topic</th>
+    <th>Details</th>
     <th>Score</th>
     <th>Weight</th>
     <th>Weighted Score</th>
-    <th>Notes</th>
 </tr>
 <% for(var i=0; i < items.length; i++) {
    var grade = items[i] %>
 <tr>
-    <td><%= grade.date %></td>
-    <td><%= grade.assessment %></td>
-    <td><%= grade.topic %></td>
-    <td><%= grade.score %></td>
-    <td><%= grade.weight %></td>
-    <td><%= grade.weighted_score %></td>
-    <td><%= grade.notes %></td>
+    <td class="date"><%= grade.date %></td>
+    <td class="assessment"><%= grade.assessment %></td>
+    <td class="grade detail"><a href="/grades/<%= grade._id %>">Details</a></td>
+    <td class="score"><%= grade.score %></td>
+    <td class="weight"><%= grade.weight %></td>
+    <td class="weighted_score"><%= grade.weighted_score %></td>
 </tr>
 <% } %>
 </table>
 
-<div id="data_doc">This is where the data doc JSON will display.</div>
+<br clear="all">
+
+<div id="data_doc"></div>
