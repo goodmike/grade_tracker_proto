@@ -44,7 +44,23 @@
 </tr>
 <% } %>
 </table>
+</div>
 
+<!-- state transfer for adding a grade -->
+<form class="grade-post" method="post" action="/grades">
+    <label for="grade_date">Date</label>
+    <input type="text" name="date" id="grade_date" requried="true" />
+    <label for="grade_assessment">Assessment Type</label>
+    <input type="text" name="assessment" id="="grade_assessment" requried="true" />
+    <label for="grade_score">Score</label>
+    <input type="text" name="score" id="grade_score" requried="true" /> 
+    <label for="grade_topic">Topic</label>
+    <input type="text" name="topic" id="grade_topic" requried="true" />
+    <label for="grade_notes">Notes</label>
+    <textarea name="notes" id="grade_notes" requried="false"></textarea>
+
+    <input type="submit" value="Post" />
+</form>
 <br clear="all">
 
 <div id="data_doc"></div>
