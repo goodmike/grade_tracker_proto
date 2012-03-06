@@ -1,0 +1,18 @@
+"items" : [
+    <% for(i=0,x=items.length;i<x;i++) { 
+           var val = items[i] %>
+    {
+    
+        "href" : "/grades/<%=val._id%>",
+        "data" : {
+            "date": "<%= val.date %>",
+            "assessment": "<%= val.assessment %>",
+            "id": "<%= val._id %>",
+            "score": "<%= val.score %>",
+            "weight": "<%= val.weight %>",
+            "weighted_score": "<%= val.weighted_score %>"
+        }      
+        
+      }<% if(i<items.length-1){%>,<% } %>
+      <% } %>
+]

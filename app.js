@@ -47,33 +47,52 @@ var db = new(cradle.Connection)(host, port, {auth: credentials}).database(dbname
 // app.get('/', routes.index);
 app.get('/', routes.index(db));
 // app.get('/tracker', routes.show(db));
+
+// helper fn for readying grades collection
+var collect_grades = function(rows) {
+    var weights = {};
+    var grades = [];
+    console.log("rows.length: " + rows.length);
+    for (var i=0; i<rows.length; i++) {
+        var date = rows[i].key[0];
+        if (date === 0) {
+            var assessment = rows[i].key[1];
+            var weight = parseInt(rows[i].value.weight, 10);
+            weights[assessment] = weight;
+        } else {
+            grades.push(rows[i].value);   
+        }
+    }
+    for (var i=0; i<grades.length; i++) {
+        var grade = grades[i];
+        grade.weight = weights[grade.assessment];
+        grade.score = parseInt(grade.score, 10);
+        grade.weighted_score = grade.weight * grade.score;
+    }
+    return grades;
+};
+
 app.get('/tracker', function(req,res) {
     db.get('_design/basic/_view/grades_and_weights', function(err,doc) {
-        var rows = doc.rows;
-        var weights = {};
-        var grades = [];
-        console.log("rows.length: " + rows.length);
-        for (var i=0; i<rows.length; i++) {
-            var date = rows[i].key[0];
-            if (date === 0) {
-                var assessment = rows[i].key[1];
-                var weight = parseInt(rows[i].value.weight, 10);
-                weights[assessment] = weight;
-            } else {
-                grades.push(rows[i].value);   
-            }
-        }
-        for (var i=0; i<grades.length; i++) {
-            var grade = grades[i];
-            grade.weight = weights[grade.assessment];
-            grade.score = parseInt(grade.score, 10);
-            grade.weighted_score = grade.weight * grade.score;
-        }
         res.render('show', {
             title: 'Grade Tracker',
-            items: grades
+            items: collect_grades(doc.rows)
         });
     });
+});
+
+// JSON for backbone integration phase 1
+app.get('/grades', function(req, res) {
+    db.get('_design/basic/_view/grades_and_weights', function(err,doc) {
+       for ( var key in err) {
+           console.log("err[" + key + "]: " + err[key]);
+       }
+        res.render('show_json', {
+            layout : 'layout_json',
+            title: 'Grade Tracker',
+            items: collect_grades(doc.rows)
+        });
+    });    
 });
 
 port = process.env.C9_PORT || process.env.PORT || 3000;
