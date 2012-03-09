@@ -1,6 +1,20 @@
-$("#grades_chart").on('gradesRedraw', function() {
-   alert("Redraw!"); 
-});
+originalSync = Backbone.sync
+
+// Our new overriding sync with dataType and ContentType
+// that override the default JSON configurations.
+/*
+Backbone.sync = function (method, model, options) {
+
+  var options = _.extend(options,
+    { dataType: 'xml',
+      contentType: 'application/xml',
+      processData: false
+    }
+  );
+
+  originalSync.apply(Backbone, [ method, model, options ])
+};
+*/
 
 var tableHeaders = function() {
     var headers = [].slice.apply(arguments);
@@ -13,19 +27,47 @@ var tableHeaders = function() {
 
 $(function() {
    
+   console.log("beginning on-ready JS");
+   
    window.Grade = Backbone.Model.extend({
        
    });
    
-   window.GradeList = Backbone.Collection.extend({
+    window.GradeList = Backbone.Collection.extend({
        
-       model: Grade,
-       url: "/grades",
-       parse: function(response) {
+        model: Grade,
+        url: "/tracker",
+        
+        parse: function(response) {
            var items = new Backbone.Collection(response.collection.items);
            this.items_length = items.length;
            return items.pluck("data");
        }
+        
+/*         parse: function(resp) {
+            console.log("GradeList#begin");
+            return [
+                {"_id":"68ed2c9f8457e4054ac82f756d5ea541","_rev":"1-f1bd42e707e23ad4563cca8481f15e7c","type":"score","topic":"Section 8.1","assessment":"homework","weight":"1","score":"100","notes":"","date":"2012-02-01"},
+                {"_id":"68ed2c9f8457e4054ac82f756d5eb039","_rev":"1-cbdd9fa46959755f015e873f9113cc52","type":"score","topic":"Section 8.2","assessment":"homework","weight":"1","score":"100","notes":"","date":"2012-02-03"}
+            ];   
+        }
+*/
+/*
+        parse: function(response) {
+            console.log("GradeList#begin");
+            var data = $("table.all", response);
+            var cols = _.pluck($("col", data), 'className');
+            var models = _.map($("tr", data), function(tr, key) {
+                var table_cells = $("td", $(tr))
+                return _.reduce(table_cells, function(memo, td, key) {
+                    memo[cols[key]] = $(td).html();
+                    return memo;
+                }, {});
+            });
+            console.log("I have " + models.length + " models.");
+            return models;
+        }
+*/
    });
 
     window.GradeListView = Backbone.View.extend({

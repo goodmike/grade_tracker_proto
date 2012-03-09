@@ -9,6 +9,10 @@ var cradle = require('cradle')
 
 var app = module.exports = express.createServer();
 
+
+// global data, helpers
+var contentType = 'text/html';
+
 // Configuration
 
 app.configure(function(){
@@ -52,7 +56,6 @@ app.get('/', routes.index(db));
 var collect_grades = function(rows) {
     var weights = {};
     var grades = [];
-    console.log("rows.length: " + rows.length);
     for (var i=0; i<rows.length; i++) {
         var date = rows[i].key[0];
         if (date === 0) {
@@ -73,7 +76,11 @@ var collect_grades = function(rows) {
 };
 
 app.get('/tracker', function(req,res) {
+    
+    var ctype = acceptsXml(req);
+    
     db.get('_design/basic/_view/grades_and_weights', function(err,doc) {
+        res.header('content-type',ctype);
         res.render('show', {
             title: 'Grade Tracker',
             items: collect_grades(doc.rows)
@@ -94,6 +101,26 @@ app.get('/grades', function(req, res) {
         });
     });    
 });
+
+/* support various content-types from clients */
+function acceptsXml(req) {
+  var ctype = contentType;
+  var acc = req.headers["accept"];
+  console.log('acceptsXml finds req.headers["accept"] ' + acc);
+  if (acc.search(/text\/xml/) != -1) {
+      ctype = "text/xml";
+  } else if (acc.search(/application\/xml/) != -1) {
+      ctype = "application/xml";
+  } else if (acc.search(/application\/xhtml\+xml/) != -1) {
+      ctype = "application/xhtml+xml";
+  }
+
+  console.log("acceptsXml chooses content type " + ctype);
+  return ctype;
+}
+
+
+
 
 port = process.env.C9_PORT || process.env.PORT || 3000;
 app.listen(port);
