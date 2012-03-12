@@ -22,9 +22,13 @@ $(function() {
        model: Grade,
        url: "/grades",
        parse: function(response) {
+           console.log("GradeList#parse");
            var items = new Backbone.Collection(response.collection.items);
            this.items_length = items.length;
            return items.pluck("data");
+       },
+       resetFromGradesTable: function() {
+           return [{}];
        }
    });
 
@@ -56,7 +60,6 @@ $(function() {
       template: _.template("<td><%= score %></td><td><%= assessment %></td><td><%= score %></td><td><%= weighted_score %></td>"),
       
       render: function() {
-        console.log("GradeView render");
         $(this.el).html(this.template(this.model.toJSON()));
         return this;
       }
@@ -68,6 +71,7 @@ $(function() {
         initialize: function() {
             
             this.grades = new GradeList();
+            // this.grades.resetFromGradesTable();
             this.gradeListView = new GradeListView({model:this.grades});
             this.grades.fetch();
             $(this.el).html(this.gradeListView.render().el);
