@@ -30,6 +30,23 @@ app.configure('production', function(){
 
 var dev = true;
 
+var contentType = "text/html";
+
+/* support various content-types from clients */
+function acceptsXml(req) {
+    var acc = req.headers["accept"];
+  
+    if (acc.match(/text\/xml/)) {
+        return "text/xml";
+    } else if (acc.match(/application\/xml/)) {
+        return "application/xml";
+    } else if (acc.match(/application\/xhtml\+xml/)) {
+        return "application/xhtml+xml";
+    }
+    return contentType;
+}
+
+
 // for couch
 var host = 'https://goodmike.cloudant.com'
   , port = 443
@@ -74,6 +91,8 @@ var collect_grades = function(rows) {
 
 app.get('/tracker', function(req,res) {
     db.get('_design/basic/_view/grades_and_weights', function(err,doc) {
+        var ctype = acceptsXml(req);
+        res.header('content-type',ctype);
         res.render('show', {
             title: 'Grade Tracker',
             items: collect_grades(doc.rows)
