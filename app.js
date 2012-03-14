@@ -39,7 +39,7 @@ var contentType = "text/html";
 /* support various content-types from clients */
 function acceptsXml(req) {
     var acc = req.headers["accept"];
-  
+    console.log("request header's 'accept': " + acc);
     if (acc.match(/text\/html/)) {
         return "text/html";
     } else if (acc.match(/text\/xml/)) {
@@ -52,6 +52,7 @@ function acceptsXml(req) {
     return contentType;
 }
 
+var qquote = String.fromCharCode(34);
 
 // for couch
 var host = 'https://goodmike.cloudant.com'
@@ -107,6 +108,59 @@ app.get('/tracker', function(req,res) {
     });
 });
 
+var collect_tracker = function(rows) {
+    var weights = {};
+    var grades = [];
+    var tracker;
+    for (var i=0; i<rows.length; i++) {
+        var key = rows[i].key[1];
+        if (key === 'weight') {
+            var weight = rows[i].value;
+            weights[weight.assessment] = parseInt(weight.weight, 10);
+        } else if (key === 'tracker') {
+            tracker = rows[i].value;
+        } else {
+            grades.push(rows[i].value);   
+        }
+    }
+    for (var i=0; i<grades.length; i++) {
+        var grade = grades[i];
+        grade.weight = weights[grade.assessment];
+        grade.score = parseInt(grade.score, 10);
+        grade.weighted_score = grade.weight * grade.score;
+    }
+    grades.push({"tracker": tracker});
+    return grades;
+};
+
+
+/* GET user profile page */
+app.get('/trackers/:i', function(req,res) {
+    
+    var options, id;
+    
+    id = req.params.i;
+    options = {
+//        startkey: encodeURIComponent('["' + id + '",0]'),
+//        endkey: encodeURIComponent('["' + id + '",{}]')
+        startkey: '["' + id + '",0]',
+        endkey: '["' + id + '",{}]'
+    };
+    
+    db.get('_design/basic/_view/tracker_by_id', options, function(err,doc) {
+       for (key in err) {
+           console.log("err[" + key + "]: " + err[key]);
+       };
+//       res.header('content-type',acceptsXml(req));
+       res.header('content-type', "text/html");
+       res.render('tracker', {
+          title: id,
+          items: collect_tracker(doc.rows)
+       });
+   });
+});
+
+
 // JSON for backbone integration phase 1
 app.get('/grades', function(req, res) {
     db.get('_design/basic/_view/grades_and_weights', function(err,doc) {
@@ -125,7 +179,7 @@ app.get('/grades', function(req, res) {
 function acceptsXml(req) {
   var ctype = contentType;
   var acc = req.headers["accept"];
-  console.log('acceptsXml finds req.headers["accept"] ' + acc);
+  
   if (acc.search(/text\/xml/) != -1) {
       ctype = "text/xml";
   } else if (acc.search(/application\/xml/) != -1) {
@@ -134,7 +188,6 @@ function acceptsXml(req) {
       ctype = "application/xhtml+xml";
   }
 
-  console.log("acceptsXml chooses content type " + ctype);
   return ctype;
 }
 

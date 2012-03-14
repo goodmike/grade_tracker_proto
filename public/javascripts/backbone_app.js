@@ -26,8 +26,6 @@ function processGrades(grades) {
     var gradesline = _.map(grades, function(grade) {
         return [grade.date + " 12:00PM", parseInt(grade.score, 10)];
     });
-
-    console.log("gradesline: " + gradesline);
            
     var targetline = [["2012-01-23 12:00AM", 88],['2012-03-12 12:00AM', 88]];
 
@@ -84,8 +82,6 @@ function processGrades(grades) {
 
 $(function() {
    
-   console.log("beginning on-ready JS");
-   
    window.Grade = Backbone.Model.extend({
 
    });
@@ -93,17 +89,11 @@ $(function() {
     window.GradeList = Backbone.Collection.extend({
        
        model: Grade,
-//       url: "/grades",
-//       parse: function(response) {
-//           console.log("GradeList#parse");
-//           var items = new Backbone.Collection(response.collection.items);
-//           this.items_length = items.length;
-//           return items.pluck("data");
-//      },
+
         url: "/tracker",
         parse: function(response) {
-            $("#hidden_response").html($("table.all", $(response)));
-            var data = $("#hidden_response");
+            $("#grades").html($("table.all", $(response)));
+            var data = $("#grades");
             var cols = _.pluck($("col", data), 'className');
             var rows = $("tr", data).slice(1);
             var models = _.map(rows, function(tr, key) {
@@ -135,31 +125,6 @@ $(function() {
             });
             this.reset(models);
        }
-        
-/*         parse: function(resp) {
-            console.log("GradeList#begin");
-            return [
-                {"_id":"68ed2c9f8457e4054ac82f756d5ea541","_rev":"1-f1bd42e707e23ad4563cca8481f15e7c","type":"score","topic":"Section 8.1","assessment":"homework","weight":"1","score":"100","notes":"","date":"2012-02-01"},
-                {"_id":"68ed2c9f8457e4054ac82f756d5eb039","_rev":"1-cbdd9fa46959755f015e873f9113cc52","type":"score","topic":"Section 8.2","assessment":"homework","weight":"1","score":"100","notes":"","date":"2012-02-03"}
-            ];   
-        }
-*/
-/*
-        parse: function(response) {
-            console.log("GradeList#begin");
-            var data = $("table.all", response);
-            var cols = _.pluck($("col", data), 'className');
-            var models = _.map($("tr", data), function(tr, key) {
-                var table_cells = $("td", $(tr))
-                return _.reduce(table_cells, function(memo, td, key) {
-                    memo[cols[key]] = $(td).html();
-                    return memo;
-                }, {});
-            });
-            console.log("I have " + models.length + " models.");
-            return models;
-        }
-*/
    });
 
     window.GradeListView = Backbone.View.extend({
@@ -178,7 +143,7 @@ $(function() {
             _.each(this.model.models, function (grade) {
                 $(this.el).append(new GradeView({model:grade}).render().el);
             }, this);
-            processGrades(this.model.models);
+            processGrades(this.model.toJSON());
             return this;
         }
         

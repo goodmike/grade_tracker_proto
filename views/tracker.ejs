@@ -1,0 +1,10 @@
+<h2>Tracker/show, v.1</h2>
+
+<% for(var i=0; i < items.length; i++) {
+   var grade = items[i] %>
+<ul>
+    <% for(var j in grade) { %>
+        <li><%= j %>: <%= grade[j] %></li>
+    <% } %>
+</ul>
+<% } %>

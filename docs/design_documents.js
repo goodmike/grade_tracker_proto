@@ -17,6 +17,9 @@ var _design_basic =
         },
         "weights": {
             "map": "function(doc) { if (doc.type === 'assessment_weight') {emit(doc.assessment, parseInt(doc.weight, 10));} }"
+        },
+        "tracker_by_id": {
+            "map": "function(doc) { if (doc.type === 'score') { emit([doc.tracker_id, doc.date], doc); } else if (doc.type === 'assessment_weight') { emit([doc.tracker_id,'weight'],doc); } else if (doc.type === 'tracker') { emit([doc._id,'tracker'], doc); } }"
         }
     }
 }

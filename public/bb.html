@@ -17,170 +17,20 @@
                 src="/javascripts/jqplot/plugins/jqplot.dateAxisRenderer.js"></script>
         
         <script type="text/javascript" src="/javascripts/backbone_app.js"></script>
+        
+        <style type="text/css">
+            #grades_chart {
+                width:800px;
+                margin:20px;
+            }
+        </style>
     </head>
     <body>
         <div id="grades_chart"></div>
         <div id="specialoutput"></div>
         <div id="grades_table"></div>
         
-        
-<div id="grades">
-<p>Data Table</p>
-<table class="all">
-<col class="date">
-<col class="assessment">
-<col class="details_link">
-<col class="score">
-<col class="weight">
-<col class="weighted_score">
-<tr>
-    <th>Date</th>
-    <th>Assessment</th>
-    <th>Details</th>
-    <th>Score</th>
-    <th>Weight</th>
-    <th>Weighted Score</th>
-</tr>
-
-<tr>
-    <td class="date">2012-02-01</td>
-    <td class="assessment">homework</td>
-    <td class="grade detail"><a href="/grades/68ed2c9f8457e4054ac82f756d5ea541">Details</a></td>
-    <td class="score">100</td>
-    <td class="weight">1</td>
-    <td class="weighted_score">100</td>
-</tr>
-
-<tr>
-    <td class="date">2012-02-03</td>
-    <td class="assessment">homework</td>
-    <td class="grade detail"><a href="/grades/68ed2c9f8457e4054ac82f756d5eb039">Details</a></td>
-    <td class="score">100</td>
-    <td class="weight">1</td>
-    <td class="weighted_score">100</td>
-</tr>
-
-<tr>
-    <td class="date">2012-02-06</td>
-    <td class="assessment">homework</td>
-    <td class="grade detail"><a href="/grades/68ed2c9f8457e4054ac82f756d5ec027">Details</a></td>
-    <td class="score">85</td>
-    <td class="weight">1</td>
-    <td class="weighted_score">85</td>
-</tr>
-
-<tr>
-    <td class="date">2012-02-08</td>
-    <td class="assessment">quiz</td>
-    <td class="grade detail"><a href="/grades/68ed2c9f8457e4054ac82f756d5e9757">Details</a></td>
-    <td class="score">89</td>
-    <td class="weight">4</td>
-    <td class="weighted_score">356</td>
-</tr>
-
-<tr>
-    <td class="date">2012-02-10</td>
-    <td class="assessment">homework</td>
-    <td class="grade detail"><a href="/grades/68ed2c9f8457e4054ac82f756d5ec52a">Details</a></td>
-    <td class="score">95</td>
-    <td class="weight">1</td>
-    <td class="weighted_score">95</td>
-</tr>
-
-<tr>
-    <td class="date">2012-02-13</td>
-    <td class="assessment">homework</td>
-    <td class="grade detail"><a href="/grades/68ed2c9f8457e4054ac82f756d5ec9ac">Details</a></td>
-    <td class="score">100</td>
-    <td class="weight">1</td>
-    <td class="weighted_score">100</td>
-</tr>
-
-<tr>
-    <td class="date">2012-02-15</td>
-    <td class="assessment">homework</td>
-    <td class="grade detail"><a href="/grades/68ed2c9f8457e4054ac82f756d5ed6dd">Details</a></td>
-    <td class="score">60</td>
-    <td class="weight">1</td>
-    <td class="weighted_score">60</td>
-</tr>
-
-<tr>
-    <td class="date">2012-02-17</td>
-    <td class="assessment">quiz</td>
-    <td class="grade detail"><a href="/grades/68ed2c9f8457e4054ac82f756d5ed7ee">Details</a></td>
-    <td class="score">85</td>
-    <td class="weight">4</td>
-    <td class="weighted_score">340</td>
-</tr>
-
-<tr>
-    <td class="date">2012-02-20</td>
-    <td class="assessment">homework</td>
-    <td class="grade detail"><a href="/grades/68ed2c9f8457e4054ac82f756d5ee3e6">Details</a></td>
-    <td class="score">100</td>
-    <td class="weight">1</td>
-    <td class="weighted_score">100</td>
-</tr>
-
-<tr>
-    <td class="date">2012-02-22</td>
-    <td class="assessment">homework</td>
-    <td class="grade detail"><a href="/grades/68ed2c9f8457e4054ac82f756d9ab5f7">Details</a></td>
-    <td class="score">80</td>
-    <td class="weight">1</td>
-    <td class="weighted_score">80</td>
-</tr>
-
-<tr>
-    <td class="date">2012-02-24</td>
-    <td class="assessment">homework</td>
-    <td class="grade detail"><a href="/grades/68ed2c9f8457e4054ac82f756d9aba0a">Details</a></td>
-    <td class="score">90</td>
-    <td class="weight">1</td>
-    <td class="weighted_score">90</td>
-</tr>
-
-<tr>
-    <td class="date">2012-02-27</td>
-    <td class="assessment">homework</td>
-    <td class="grade detail"><a href="/grades/68ed2c9f8457e4054ac82f756d9ac2d9">Details</a></td>
-    <td class="score">60</td>
-    <td class="weight">1</td>
-    <td class="weighted_score">60</td>
-</tr>
-
-<tr>
-    <td class="date">2012-02-29</td>
-    <td class="assessment">quiz</td>
-    <td class="grade detail"><a href="/grades/68ed2c9f8457e4054ac82f756d9ac9e1">Details</a></td>
-    <td class="score">85</td>
-    <td class="weight">4</td>
-    <td class="weighted_score">340</td>
-</tr>
-
-<tr>
-    <td class="date">2012-03-02</td>
-    <td class="assessment">homework</td>
-    <td class="grade detail"><a href="/grades/68ed2c9f8457e4054ac82f756d9acf57">Details</a></td>
-    <td class="score">98</td>
-    <td class="weight">1</td>
-    <td class="weighted_score">98</td>
-</tr>
-
-<tr>
-    <td class="date">2012-03-05</td>
-    <td class="assessment">test</td>
-    <td class="grade detail"><a href="/grades/68ed2c9f8457e4054ac82f756d9ad821">Details</a></td>
-    <td class="score">95</td>
-    <td class="weight">10</td>
-    <td class="weighted_score">950</td>
-</tr>
-
-</table>
-</div>
-        
-<div id="hidden_response" style="display:none"></div>        
+<div id="grades"></div>
         
     </body>
 </html>
