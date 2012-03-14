@@ -36,7 +36,9 @@ var contentType = "text/html";
 function acceptsXml(req) {
     var acc = req.headers["accept"];
   
-    if (acc.match(/text\/xml/)) {
+    if (acc.match(/text\/html/)) {
+        return "text/html";
+    } else if (acc.match(/text\/xml/)) {
         return "text/xml";
     } else if (acc.match(/application\/xml/)) {
         return "application/xml";

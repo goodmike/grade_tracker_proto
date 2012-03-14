@@ -4,19 +4,13 @@ Backbone.sync = function(method, model, options) {
 
    // Default JSON-request options.
    var params = _.extend({
-     contentType:  'application/xml',
-     dataType:     'xml',
+     contentType:  'text/html',
+     dataType:     'html',
      processData:  false
    }, options);
    
    originalSync(method, model, params);
 };
-
-
-
-$("#grades_chart").on('gradesRedraw', function() {
-   alert("Redraw!"); 
-});
 
 var tableHeaders = function() {
     var headers = [].slice.apply(arguments);
@@ -26,6 +20,67 @@ var tableHeaders = function() {
         }).join("\n") + 
     "</tr>";
 };
+
+function processGrades(grades) {
+    
+    var gradesline = _.map(grades, function(grade) {
+        return [grade.date + " 12:00PM", parseInt(grade.score, 10)];
+    });
+
+    console.log("gradesline: " + gradesline);
+           
+    var targetline = [["2012-01-23 12:00AM", 88],['2012-03-12 12:00AM', 88]];
+
+    var running_avg_points = _.reduce(grades, function(memo, grade, i) {
+        var d = grade.date + " 12:00PM";
+        var p = parseInt(grade.weighted_score,10);
+        var w = parseInt(grade.weight,10);
+        if (i===0) return [{"date": d, "points": p, "weight": w}];
+        var last = memo[i-1];
+        console.log(last);
+        memo.push({"date": d, "points": p + last.points, "weight": w + last.weight});
+        return memo;
+    }, []);
+    var running_avg_line = _.map(running_avg_points, function(point) {
+        return [point.date, point.points/point.weight];
+    });
+
+    console.log(running_avg_line);
+    
+    $.jqplot('grades_chart', [targetline, running_avg_line, gradesline], {
+    title:'Time Series with default date axis',
+    axes:{
+        yaxis: {min:50, max:105, tickInterval:10},
+        xaxis:{
+            renderer:$.jqplot.DateAxisRenderer,
+            tickOptions:{formatString:"%b %#d '12"},
+            min:'January 23, 2012',
+            max:'March 12, 2012',
+            tickInterval:'1 week'
+        }
+    },
+    fillBetween: {
+      series1: 1,
+      series2: 0,
+      color: "rgba(227, 167, 111, 0.5)"
+    },
+    series: [
+    {
+      // showLine: false
+      lineWidth: 1
+    },
+    {
+      rendererOptions: {
+        smooth: true
+      },
+      markerOptions: {
+        show: false
+      }
+    },
+    {}]
+});
+}
+
 
 $(function() {
    
@@ -45,9 +100,8 @@ $(function() {
 //      },
         url: "/tracker",
         parse: function(response) {
-            console.log("GradeList#parse");
-/*
-            var data = $("table.all", response);
+            $("#hidden_response").html($("table.all", $(response)));
+            var data = $("#hidden_response");
             var cols = _.pluck($("col", data), 'className');
             var rows = $("tr", data).slice(1);
             var models = _.map(rows, function(tr, key) {
@@ -59,11 +113,12 @@ $(function() {
                 return model;
             });
             return models;
-*/
+/*
             return [{date: "2012-02-01", assessment: "homework", 
                      details_link: "<a href=\"/grades/68ed2c9f8457e4054ac82f756d5ea541\">Details</a>",
                      score: "100", weight: "1", weighted_score: "100"}];
-        },
+*/
+},
         resetFromGradesTable: function() {
             var data = $("table.all");
             var cols = _.pluck($("col", data), 'className');
@@ -96,7 +151,7 @@ $(function() {
             _.each(this.model.models, function (grade) {
                 $(this.el).append(new GradeView({model:grade}).render().el);
             }, this);
-            $.event.trigger('gradesRedraw');
+            processGrades(this.model.models);
             return this;
         }
         
@@ -108,10 +163,6 @@ $(function() {
       template: _.template("<td><%= score %></td><td><%= assessment %></td><td><%= score %></td><td><%= weighted_score %></td>"),
       
       render: function() {
-          console.log("Examining Model");
-          console.log(this.model);
-          console.log(this.model.toJSON());
-          console.log(this.model.score);
         $(this.el).html(this.template(this.model.toJSON()));
         return this;
       }

@@ -18,12 +18,15 @@
 <div id="grades">
 <p>Data Table</p>
 <table class="all">
-<col class="date">
-<col class="assessment">
-<col class="details_link">
-<col class="score">
-<col class="weight">
-<col class="weighted_score">
+<colgroup>
+    <col class="date" />
+    <col class="assessment" />
+    <col class="details_link" />
+    <col class="score" />
+    <col class="weight" />
+    <col class="weighted_score" />
+</colgroup>
+<tbody>
 <tr>
     <th>Date</th>
     <th>Assessment</th>
@@ -43,6 +46,7 @@
     <td class="weighted_score"><%= grade.weighted_score %></td>
 </tr>
 <% } %>
+</tbody>
 </table>
 </div>
 
@@ -51,7 +55,7 @@
     <label for="grade_date">Date</label>
     <input type="text" name="date" id="grade_date" requried="true" />
     <label for="grade_assessment">Assessment Type</label>
-    <input type="text" name="assessment" id="="grade_assessment" requried="true" />
+    <input type="text" name="assessment" id="grade_assessment" requried="true" />
     <label for="grade_score">Score</label>
     <input type="text" name="score" id="grade_score" requried="true" /> 
     <label for="grade_topic">Topic</label>
@@ -61,6 +65,5 @@
 
     <input type="submit" value="Post" />
 </form>
-<br clear="all">
 
 <div id="data_doc"></div>
