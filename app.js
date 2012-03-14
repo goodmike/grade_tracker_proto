@@ -34,6 +34,25 @@ app.configure('production', function(){
 
 var dev = true;
 
+var contentType = "text/html";
+
+/* support various content-types from clients */
+function acceptsXml(req) {
+    var acc = req.headers["accept"];
+  
+    if (acc.match(/text\/html/)) {
+        return "text/html";
+    } else if (acc.match(/text\/xml/)) {
+        return "text/xml";
+    } else if (acc.match(/application\/xml/)) {
+        return "application/xml";
+    } else if (acc.match(/application\/xhtml\+xml/)) {
+        return "application/xhtml+xml";
+    }
+    return contentType;
+}
+
+
 // for couch
 var host = 'https://goodmike.cloudant.com'
   , port = 443
