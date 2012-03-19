@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html> 
+  <head>
+    <title>Binder App</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    
+    <script type="text/javascript" 
+            src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" 
+            src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.3.1/underscore-min.js"></script>
+
+<!--        <script type="text/javascript" 
+                src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.0/backbone-min.js"></script>
+-->
+    <script type="text/javascript" src="/javascripts/backbone.js"></script>
+    <script type="application/javascript" 
+            src="/javascripts/jqplot/jquery.jqplot.js"></script>
+    <script type="application/javascript" 
+            src="/javascripts/jqplot/plugins/jqplot.dateAxisRenderer.js"></script>
+    
+    <script type="text/javascript" src="/binder/javascripts/tracker_app.js"></script>
+        
+    <style type="text/css">
+        #grades_chart {
+            width:800px;
+            margin:20px;
+        }
+        .data {
+            display:none;    
+        }
+    </style>
+  </head>
+  <body>
+    <div id="binder_app"></div>
+    <div id="primary_data"></div>
+    <div id="secondary_data"></div>
+  </body>
+</html>

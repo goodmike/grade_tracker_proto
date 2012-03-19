@@ -79,18 +79,91 @@ function processGrades(grades) {
 });
 }
 
+var binderUrl = "/binder/";
+var httpAPIUrl = "/html/";
 
 $(function() {
    
-   window.Grade = Backbone.Model.extend({
+    window.Tracker = Backbone.Model.extend({
+        parse: function(response) {
+            if (response.url && response.subject) {
+                return response;
+            }
+            $("#primary_data").html($("div#tracker ul.single", $(response)));
+            $("#primary_data").append($("div#grades table.all", $(response)));
+            var data = $("#primary_data");
+            return {
+                url: $("a[rel=grade]", data).attr("href"),
+                subject: $(".tracker", data).text()
+            }
+        },
+        
+        url: function() {
+            return httpAPIUrl + "tracker/" + this._id; 
+        }
+    });
+   
+    window.TrackerList = Backbone.Collection.extend({
+        model: window.Tracker,
+        
+        parse: function(response) {
+            $("#primary_data").html($("div#trackers ul.all", $(response)));
+            var data = $("#primary_data ul.all");
 
-   });
+            var records = $("li", data);
+            var models = _.map(records, function(li) {
+                return {
+                    url: $("a[rel=tracker]", $(li)).attr("href"),
+                    subject: $(".subject", $(li)).text()
+                };
+            });
+            return models;
+        },
+        
+        url: httpAPIUrl + "trackers/"
+    });
+    
+    
+    window.TrackerListView = Backbone.View.extend({
+ 
+        tagName:'div',
+ 
+        initialize:function () {
+            this.model.bind("reset", this.render, this);
+        },
+ 
+        render:function (eventName) {
+            
+            $(this.el).html('<ul class="trackers">');
+            _.each(this.model.models, function (tracker) {
+                $(this.el).append(new TrackerView({model:tracker}).render().el);
+            }, this);
+            $(this.el).append('</ul>');
+            return this;
+        }
+        
+    });
+   
+    window.TrackerView = Backbone.View.extend({
+      
+        render: function() {
+            $(this.el).html(this.template(this.model.toJSON()));
+            return this;
+        },
+        
+        tagName: 'li',
+        template: _.template('<a href="<%= url %>"><%= subject %></a>')
+      
+    });
+        
+    window.Grade = Backbone.Model.extend({
+
+    });
    
     window.GradeList = Backbone.Collection.extend({
        
-       model: Grade,
+        model: Grade,
 
-        url: "/html/trackers/be8f73c1c67776de7b08d904ca9f2d04",
         parse: function(response) {
             $("#grades").html($("table.all", $(response)));
             var data = $("#grades");
@@ -115,7 +188,8 @@ $(function() {
                      details_link: "<a href=\"/grades/68ed2c9f8457e4054ac82f756d5ea541\">Details</a>",
                      score: "100", weight: "1", weighted_score: "100"}];
 */
-},
+        },
+        
         resetFromGradesTable: function() {
             var data = $("table.all");
             var cols = _.pluck($("col", data), 'className');
@@ -129,6 +203,10 @@ $(function() {
                 return model;
             });
             this.reset(models);
+       },
+       
+       url: function() {
+           return this.tracker.url + "/grades";
        }
    });
 
@@ -166,7 +244,21 @@ $(function() {
       }
    });
    
-   window.AppView = Backbone.View.extend({
+    window.AppView = Backbone.View.extend({
+        
+        el: $('#binder_app'),
+        initialize: function() {
+            
+            this.trackers = new TrackerList();
+            this.trackerListView = new TrackerListView({model:this.trackers});
+            this.trackers.fetch();
+            $(this.el).html(this.trackerListView.render().el);
+        },
+    });
+   
+//  For index of single tracker's grades
+/*
+    window.AppView = Backbone.View.extend({
       
         el: $("#grades_table"),
         initialize: function() {
@@ -176,9 +268,10 @@ $(function() {
             this.grades.fetch();
             $(this.el).html(this.gradeListView.render().el);
         },
-      
+  
     });
-    
+*/    
+
     window.App = new AppView;
    
 });

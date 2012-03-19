@@ -1,0 +1,18 @@
+<h1><%= title %></h1>
+
+<div id="trackers">
+<ul class="all">
+<% for(var i=0; i < items.length; i++) {
+   var tracker = items[i].value %>
+   <li>
+        <a rel="tracker" href="<%= site %>trackers/<%= tracker._id %>"
+           title="view tracker">
+            <span class="subject"><%= tracker.subject %></span></a>
+        <span class="single">| from</span>
+        <span class="date-start"><%= tracker.start_date %></span>
+        <span class="single">to</span>
+        <span class="date-end"><%= tracker.end_date %></span>
+    </li>
+<% } %>
+</ul>
+</div>

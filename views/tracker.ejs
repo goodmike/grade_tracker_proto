@@ -1,5 +1,90 @@
-<h2>Tracker/show, v.1</h2>
+<h2>Tracker</h2>
+<div class="tracker-grades-block">
 
+<div id="tracker">
+    <ul class="single">
+      <li>
+        <a rel="tracker" href="<%= site %>trackers/<%= tracker._id %>"
+           title="edit tracker">
+            <span class="subject"><%= tracker.subject %></span></a>
+        <span class="single">from</span>
+        <span class="date-start"><%= tracker.start_date %></span>
+        <span class="single">to</span>
+        <span class="date-end"><%= tracker.end_date %></span>
+        <span class="single">/ Goal:</span>
+        <span class="goal"><%= tracker.goal %></span>
+        </li>
+    </ul>
+    
+</div>
+
+<h2>Grades</h2>
+<div id="grades">
+
+<table class="all">
+<colgroup>
+    <col class="date" />
+    <col class="assessment" />
+    <col class="score" />
+    <col class="weight" />
+    <col class="weighted_score" />
+</colgroup>
+<tbody>
+<tr>
+    <th>Date</th>
+    <th>Assessment</th>
+    <th>Score</th>
+    <th>Weight</th>
+    <th>Weighted Score</th>
+</tr>
+<% for(var i=0; i < items.length; i++) {
+   var grade = items[i] %>
+<tr>
+    <td><%= grade.date %></td>
+    <td><%= grade.assessment %></td>
+    <td>
+        <a rel="grade" href="<%=site%>grades/<%=grade._id%>" title="grade">
+            <span class="score"><%= grade.score %></span>
+        </a>
+    </td>
+    <td class="weight"><%= grade.weight %></td>
+    <td class="weighted_score"><%= grade.weighted_score %></td>
+</tr>
+<% } %>
+</tbody>
+</table>
+
+</div>
+
+
+
+<!-- state transfer for adding a grade -->
+<form class="grade-post" method="post" action="/grades">
+    <label for="grade_date">Date</label>
+    <input type="text" name="date" id="grade_date" requried="true" />
+    <label for="grade_assessment">Assessment Type</label>
+    <input type="text" name="assessment" id="grade_assessment" requried="true" />
+    <label for="grade_score">Score</label>
+    <input type="text" name="score" id="grade_score" requried="true" /> 
+    <label for="grade_topic">Topic</label>
+    <input type="text" name="topic" id="grade_topic" requried="true" />
+    <label for="grade_notes">Notes</label>
+    <textarea name="notes" id="grade_notes" requried="false"></textarea>
+
+    <input type="submit" value="Post" />
+</form>
+</div>
+
+<!-- <h2>Tracker/show, v.1</h2>
+
+<p>Tracker</p>
+<ul>
+<% for(var k in tracker) { %>
+    <li><%= k %>: <%= tracker[k] %></li>
+<% } %>
+</ul>
+
+<p>Grades</p>
 <% for(var i=0; i < items.length; i++) {
    var grade = items[i] %>
 <ul>
@@ -8,3 +93,6 @@
     <% } %>
 </ul>
 <% } %>
+-->
+
+</div>

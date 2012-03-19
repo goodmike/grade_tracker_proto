@@ -12,6 +12,8 @@ var app = module.exports = express.createServer();
 
 // global data, helpers
 var contentType = 'text/html';
+var baseHtmlUrl = '/html/';
+var baseUiUrl = '/binder/';
 
 // Configuration
 
@@ -51,8 +53,6 @@ function acceptsXml(req) {
     }
     return contentType;
 }
-
-var qquote = String.fromCharCode(34);
 
 // for couch
 var host = 'https://goodmike.cloudant.com'
@@ -129,33 +129,52 @@ var collect_tracker = function(rows) {
         grade.score = parseInt(grade.score, 10);
         grade.weighted_score = grade.weight * grade.score;
     }
-    grades.push({"tracker": tracker});
-    return grades;
+    return {"grades": grades, "tracker": tracker};
 };
 
 
-/* GET user profile page */
-app.get('/trackers/:i', function(req,res) {
+/* GET trackers list page */
+app.get(baseHtmlUrl + 'trackers', function(req,res) {
+
+    var options, id;
+    
+    options = {};
+    
+    db.get('_design/basic/_view/trackers', options, function(err,doc) {
+       for (var key in err) {
+           console.log("err[" + key + "]: " + err[key]);
+       }
+       res.header('content-type',acceptsXml(req));
+        res.render('trackers', {
+            title: 'Grade Trackers',
+            items: doc,
+            site: baseHtmlUrl
+        });
+   });
+});
+
+/* GET tracker page */
+app.get(baseHtmlUrl + 'trackers/:i', function(req,res) {
     
     var options, id;
     
     id = req.params.i;
     options = {
-//        startkey: encodeURIComponent('["' + id + '",0]'),
-//        endkey: encodeURIComponent('["' + id + '",{}]')
         startkey: '["' + id + '",0]',
         endkey: '["' + id + '",{}]'
     };
     
     db.get('_design/basic/_view/tracker_by_id', options, function(err,doc) {
-       for (key in err) {
+       for (var key in err) {
            console.log("err[" + key + "]: " + err[key]);
-       };
-//       res.header('content-type',acceptsXml(req));
-       res.header('content-type', "text/html");
+       }
+       var rows = collect_tracker(doc.rows);
+       res.header('content-type',acceptsXml(req));
        res.render('tracker', {
           title: id,
-          items: collect_tracker(doc.rows)
+          items: rows.grades,
+          tracker: rows.tracker,
+          site: baseHtmlUrl
        });
    });
 });
@@ -180,7 +199,9 @@ function acceptsXml(req) {
   var ctype = contentType;
   var acc = req.headers["accept"];
   
-  if (acc.search(/text\/xml/) != -1) {
+  if (acc.search(/text\/html/) != -1) {
+      ctype = "text/html";
+  } else if (acc.search(/text\/xml/) != -1) {
       ctype = "text/xml";
   } else if (acc.search(/application\/xml/) != -1) {
       ctype = "application/xml";
