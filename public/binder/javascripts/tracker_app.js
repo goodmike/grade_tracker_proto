@@ -85,22 +85,33 @@ var httpAPIUrl = "/html/";
 $(function() {
    
     window.Tracker = Backbone.Model.extend({
-        parse: function(response) {
-            if (response.url && response.subject) {
-                return response;
-            }
-            $("#primary_data").html($("div#tracker ul.single", $(response)));
-            $("#primary_data").append($("div#grades table.all", $(response)));
-            var data = $("#primary_data");
-            return {
-                url: $("a[rel=grade]", data).attr("href"),
-                subject: $(".tracker", data).text()
-            }
+        
+        initialize: function(attributes) {
+            this.data_url = attributes.data_url;
         },
         
+        parse: function(response) {
+            if (!this.fetch_details) {
+                return response;
+            }
+            $("#primary_data").html($("div#tracker", $(response)));
+            $("#primary_data").append($("div#grades", $(response)));
+            var tracker_el = $("li", $("div#tracker ul.single"));
+            var new_model = {
+                data_url: $("a[rel=tracker]", tracker_el).attr("href"),
+                subject: $(".subject", tracker_el).text(),
+                start_date: $(".start_date", tracker_el).text(),
+                end_date: $(".end_date", tracker_el).text(),
+                goal: $(".goal", tracker_el).text(),
+                id: tracker_el[0].id
+            };
+            return new_model;
+        },
+      
         url: function() {
-            return httpAPIUrl + "tracker/" + this._id; 
+            return this.data_url; 
         }
+
     });
    
     window.TrackerList = Backbone.Collection.extend({
@@ -111,16 +122,21 @@ $(function() {
             var data = $("#primary_data ul.all");
 
             var records = $("li", data);
-            var models = _.map(records, function(li) {
+            var models = _.map(records, function(li, k) {
                 return {
-                    url: $("a[rel=tracker]", $(li)).attr("href"),
-                    subject: $(".subject", $(li)).text()
+                    data_url: $("a[rel=tracker]", $(li)).attr("href"),
+                    subject: $(".subject", $(li)).text(),
+                    start_date: $(".start_date", $(li)).text(),
+                    end_date: $(".end_date", $(li)).text(),
+                    goal: $(".goal", $(li)).text(),
+                    id: li.id,
+                    details_fetched: false
                 };
             });
             return models;
         },
         
-        url: httpAPIUrl + "trackers/"
+        url: httpAPIUrl + "trackers"
     });
     
     
@@ -135,13 +151,26 @@ $(function() {
         render:function (eventName) {
             
             $(this.el).html('<ul class="trackers">');
+            var ul = $("ul.trackers", $(this.el));
             _.each(this.model.models, function (tracker) {
-                $(this.el).append(new TrackerView({model:tracker}).render().el);
+                $(ul).append(new TrackerListItemView({model:tracker}).render().el);
             }, this);
             $(this.el).append('</ul>');
             return this;
         }
         
+    });
+    
+    window.TrackerListItemView = Backbone.View.extend({
+ 
+        tagName:"li",
+        template: _.template('<a href="#trackers/<%= id %>"><%= subject %></a>'),
+ 
+        render:function (eventName) {
+            $(this.el).html(this.template(this.model.toJSON()));
+            return this;
+        }
+ 
     });
    
     window.TrackerView = Backbone.View.extend({
@@ -152,7 +181,7 @@ $(function() {
         },
         
         tagName: 'li',
-        template: _.template('<a href="<%= url %>"><%= subject %></a>')
+        template: _.template('<%= subject %>')
       
     });
         
@@ -183,11 +212,6 @@ $(function() {
                 return model;
             });
             return models;
-/*
-            return [{date: "2012-02-01", assessment: "homework", 
-                     details_link: "<a href=\"/grades/68ed2c9f8457e4054ac82f756d5ea541\">Details</a>",
-                     score: "100", weight: "1", weighted_score: "100"}];
-*/
         },
         
         resetFromGradesTable: function() {
@@ -254,24 +278,39 @@ $(function() {
             this.trackers.fetch();
             $(this.el).html(this.trackerListView.render().el);
         },
-    });
-   
-//  For index of single tracker's grades
-/*
-    window.AppView = Backbone.View.extend({
-      
-        el: $("#grades_table"),
-        initialize: function() {
-            
-            this.grades = new GradeList();
-            this.gradeListView = new GradeListView({model:this.grades});
-            this.grades.fetch();
-            $(this.el).html(this.gradeListView.render().el);
-        },
-  
-    });
-*/    
+    });    
 
-    window.App = new AppView;
-   
+// Router
+var AppRouter = Backbone.Router.extend({
+ 
+    routes:{
+        "":"trackersList",
+        "trackers/:id":"trackerDetails"
+    },
+ 
+    trackersList:function() {
+        this.trackers = new TrackerList();
+        this.trackerListView = new TrackerListView({model:this.trackers});
+        this.trackers.fetch();
+        $("#binder_app").html(this.trackerListView.render().el);
+    },
+ 
+    trackerDetails:function(id) {
+        this.tracker = this.trackers.get(id);
+        this.tracker.fetch_details = true;
+        this.trackerView = new TrackerView({model:this.tracker});
+        var trackerView = this.trackerView;
+        $(".details", $("#binder_app")).remove();
+        $("#binder_app").append($('<div class="details tracker"></div>'));
+        
+        this.tracker.fetch({success: function(model, response) {
+            $(".details", $("#binder_app")).append(trackerView.render().el);
+        }});
+        
+    }
+});
+ 
+    var app = new AppRouter();
+    Backbone.history.start();
+
 });

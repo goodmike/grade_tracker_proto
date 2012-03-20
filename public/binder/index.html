@@ -21,6 +21,10 @@
     <script type="text/javascript" src="/binder/javascripts/tracker_app.js"></script>
         
     <style type="text/css">
+        body {
+            padding: 20px;
+            font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+        }
         #grades_chart {
             width:800px;
             margin:20px;
@@ -28,11 +32,32 @@
         .data {
             display:none;    
         }
+        ol, ul {
+          list-style: none;
+        }
+        #binder_app ul.trackers {
+            float:left;
+            width: 400px;
+            margin-top: 10px;
+        }
+        #binder_app ul.trackers li {
+            padding: 10px 15px 10px 0;
+            position: relative;
+            font-size: 18px;
+            border-bottom: 1px solid #cccccc;
+        }
+        
+        #binder_app .details {
+            float:left;
+            width: 400px;
+            margin-top: 10px;
+            margin-left:25px;
+        }
     </style>
   </head>
   <body>
     <div id="binder_app"></div>
-    <div id="primary_data"></div>
-    <div id="secondary_data"></div>
+    <div id="primary_data" class="data"></div>
+    <div id="secondary_data" class="data"></div>
   </body>
 </html>
