@@ -45,15 +45,26 @@ function processGrades(grades, chart_el_id) {
 
     console.log(running_avg_line);
     
+    function labelDate(grade_date) {
+        var m_names = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+
+        var d = new Date(grade_date);
+        var curr_date = d.getDate();
+        var curr_month = d.getMonth();
+        var curr_year = d.getFullYear();
+
+        return m_names[curr_month] + " " + curr_date + " " + curr_year;
+    }
+    
     $.jqplot(chart_el_id, [targetline, running_avg_line, gradesline], {
-    title:'Time Series with default date axis',
+    title:'Scores, Running Average versus Goal',
     axes:{
         yaxis: {min:50, max:104, tickInterval:10},
         xaxis:{
             renderer:$.jqplot.DateAxisRenderer,
             tickOptions:{formatString:"%b %#d '12"},
-            min:'January 23, 2012',
-            max:'March 12, 2012',
+            min: labelDate(grades[0].date),
+            max: labelDate(grades[grades.length-1].date),
             tickInterval:'1 week'
         }
     },
