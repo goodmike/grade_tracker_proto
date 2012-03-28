@@ -179,9 +179,7 @@ $(function() {
             $(this.el).html(this.template(this.model.toJSON()));
             return this;
         },
-        
-        tagName: 'li',
-        template: _.template('<%= subject %>')
+        template: _.template($('#tpl_tracker_details').html())
       
     });
         
@@ -193,9 +191,7 @@ $(function() {
        
         model: Grade,
 
-        parse: function(response) {
-            $("#grades").html($("table.all", $(response)));
-            var data = $("#grades");
+        modelsFromTable: function(data) {
             var cols = _.pluck($("col", data), 'className');
             var rows = $("tr", data).slice(1);
             var models = _.map(rows, function(tr, key) {
@@ -208,24 +204,19 @@ $(function() {
                         memo[cols[key]] = $(td).html();
                     }
                     return memo;
-                }, {});
+                }, {id: tr.id});
                 return model;
             });
             return models;
         },
+
+        parse: function(response) {
+            $("#grades").html($("table.all", $(response)));
+            return this.modelsFromTable($("#grades"));
+        },
         
-        resetFromGradesTable: function() {
-            var data = $("table.all");
-            var cols = _.pluck($("col", data), 'className');
-            var rows = $("tr", data).slice(1);
-            var models = _.map(rows, function(tr, key) {
-                var table_cells = $("td", $(tr))
-                var model = _.reduce(table_cells, function(memo, td, key) {
-                    memo[cols[key]] = $(td).html();
-                    return memo;
-                }, {});
-                return model;
-            });
+        resetFromGradesTable: function(data_element_sel) {
+            var models = this.modelsFromTable($(data_element_sel));
             this.reset(models);
        },
        
@@ -236,25 +227,31 @@ $(function() {
 
     window.GradeListView = Backbone.View.extend({
  
-        tagName:'table',
- 
         initialize:function () {
             this.model.bind("reset", this.render, this);
         },
  
         render:function (eventName) {
-            if (this.model.items_length) {
-                $("#specialoutput").html("" + this.model.items_length + " records");
-            }
-            $(this.el).html(tableHeaders("Date","Assessment","Score","Weighted Score","Options"));
+            $(this.el).append("<ul>");
             _.each(this.model.models, function (grade) {
-                $(this.el).append(new GradeView({model:grade}).render().el);
+                $(this.el).append(new GradeListItemView({model:grade}).render().el);
             }, this);
-            processGrades(this.model.toJSON());
+            $(this.el).append("<ul>");
             return this;
         }
         
     });
+    
+    window.GradeListItemView = Backbone.View.extend({
+ 
+        template: _.template($('#tpl_grade_listing').html()),
+        render:function (eventName) {
+            $(this.el).html(this.template(this.model.toJSON()));
+            return this;
+        }
+ 
+    });
+    
    
    window.GradeView = Backbone.View.extend({
       
@@ -305,6 +302,10 @@ var AppRouter = Backbone.Router.extend({
         
         this.tracker.fetch({success: function(model, response) {
             $(".details", $("#binder_app")).append(trackerView.render().el);
+            model.grades = new GradeList();
+            model.gradeListView = new GradeListView({model:model.grades});
+            model.grades.resetFromGradesTable('div#grades');
+            $(".details", $("#binder_app")).append(model.gradeListView.render().el);
         }});
         
     }

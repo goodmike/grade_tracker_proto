@@ -59,5 +59,25 @@
     <div id="binder_app"></div>
     <div id="primary_data" class="data"></div>
     <div id="secondary_data" class="data"></div>
+    
+    <style type="text/template" id="tpl_tracker_details">
+    <div class="summary">
+        <h2><%= subject %></h2>
+        <p><%= start_date %> to <%= end_date %></p>
+        <p>Goal: <%= goal %></p>
+    </div>
+    </style>
+    
+    <style type="text/template" id="tpl_grade_listing">
+    <li id="<%= id %>">
+        <span class="date"><%= date %></span>
+        <span class="assessment"><%= assessment %></span>
+        <span class="topic"><%= topic %></span>
+        <span class="score"><%= score %></span>
+        <div class="expand">
+        <span class="notes"><%= notes %></span>
+        </div>
+    </li>
+    </style>
   </body>
 </html>

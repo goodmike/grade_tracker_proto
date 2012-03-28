@@ -8,9 +8,9 @@
            title="edit tracker">
             <span class="subject"><%= tracker.subject %></span></a>
         <span class="single">from</span>
-        <span class="date-start"><%= tracker.start_date %></span>
+        <span class="start_date"><%= tracker.start_date %></span>
         <span class="single">to</span>
-        <span class="date-end"><%= tracker.end_date %></span>
+        <span class="end_date"><%= tracker.end_date %></span>
         <span class="single">/ Goal:</span>
         <span class="goal"><%= tracker.goal %></span>
         </li>
@@ -25,23 +25,28 @@
 <colgroup>
     <col class="date" />
     <col class="assessment" />
+    <col class="topic" />
     <col class="score" />
     <col class="weight" />
     <col class="weighted_score" />
+    <col class="notes" />
 </colgroup>
 <tbody>
 <tr>
     <th>Date</th>
     <th>Assessment</th>
+    <th>Topic</th>
     <th>Score</th>
     <th>Weight</th>
     <th>Weighted Score</th>
+    <th>Notes</th>
 </tr>
 <% for(var i=0; i < items.length; i++) {
    var grade = items[i] %>
-<tr>
+<tr id="<%= grade._id %>">
     <td><%= grade.date %></td>
     <td><%= grade.assessment %></td>
+    <td><%= grade.topic %></td>
     <td>
         <a rel="grade" href="<%=site%>grades/<%=grade._id%>" title="grade">
             <span class="score"><%= grade.score %></span>
@@ -49,6 +54,7 @@
     </td>
     <td class="weight"><%= grade.weight %></td>
     <td class="weighted_score"><%= grade.weighted_score %></td>
+    <td><%= grade.notes %></td>
 </tr>
 <% } %>
 </tbody>
