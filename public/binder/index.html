@@ -37,22 +37,79 @@
         }
         #binder_app ul.trackers {
             float:left;
-            width: 400px;
-            margin-top: 10px;
+            width: 240px;
+            margin: 0;
+            padding: 0;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
         }
         #binder_app ul.trackers li {
-            padding: 10px 15px 10px 0;
+            padding: 10px 15px 10px 10px;
             position: relative;
-            font-size: 18px;
+            font-size: 16px;
             border-bottom: 1px solid #cccccc;
         }
         
         #binder_app .details {
             float:left;
-            width: 400px;
-            margin-top: 10px;
+            width: 240px;
+            margin-top: 0px;
             margin-left:25px;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
         }
+        .details h2 {
+            margin-top: 0px;    
+        }
+        .summary {
+            padding: 10px 15px 10px 10px;
+            border-bottom: 1px solid #cccccc;   
+        }
+        
+        ul.grade_view_list {
+            margin:0;
+            padding:0;
+        }
+        ul.grade_view_list li {
+            padding-left: 10px;
+            margin-left: 0;
+            position: relative;
+            height: 4.6em;
+            border-bottom: 1px solid lightgray;
+        }
+        ul.grade_view_list li span {
+            position: absolute;
+        }
+        ul.grade_view_list li span.date {
+            top: .5em;
+        }
+        ul.grade_view_list li span.assessment {
+            top: 1.7em;
+        }
+        ul.grade_view_list li span.topic {
+            top: 2.9em;
+        }
+        ul.grade_view_list li span.score {
+            right: 0em;
+            font-size: 1.5em;
+            display: block;
+            top: 0em;
+            padding: .99em;
+        }
+        ul.grade_view_list li span.expand {
+            display:none;
+        }
+                
+        #binder_app #grades_chart {
+            float:left;
+            width: 640px;
+            margin-top: 0px;
+            margin-left:25px;
+            padding:5px;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
+        }
+
     </style>
   </head>
   <body>
@@ -61,23 +118,17 @@
     <div id="secondary_data" class="data"></div>
     
     <style type="text/template" id="tpl_tracker_details">
-    <div class="summary">
         <h2><%= subject %></h2>
         <p><%= start_date %> to <%= end_date %></p>
         <p>Goal: <%= goal %></p>
-    </div>
     </style>
     
     <style type="text/template" id="tpl_grade_listing">
-    <li id="<%= id %>">
         <span class="date"><%= date %></span>
         <span class="assessment"><%= assessment %></span>
         <span class="topic"><%= topic %></span>
         <span class="score"><%= score %></span>
-        <div class="expand">
-        <span class="notes"><%= notes %></span>
-        </div>
-    </li>
+        <span class="notes expand"><%= notes %></span>
     </style>
   </body>
 </html>

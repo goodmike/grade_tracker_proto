@@ -21,7 +21,7 @@ var tableHeaders = function() {
     "</tr>";
 };
 
-function processGrades(grades) {
+function processGrades(grades, chart_el_id) {
     
     var gradesline = _.map(grades, function(grade) {
         return [grade.date + " 12:00PM", parseInt(grade.score, 10)];
@@ -45,10 +45,10 @@ function processGrades(grades) {
 
     console.log(running_avg_line);
     
-    $.jqplot('grades_chart', [targetline, running_avg_line, gradesline], {
+    $.jqplot(chart_el_id, [targetline, running_avg_line, gradesline], {
     title:'Time Series with default date axis',
     axes:{
-        yaxis: {min:50, max:105, tickInterval:10},
+        yaxis: {min:50, max:104, tickInterval:10},
         xaxis:{
             renderer:$.jqplot.DateAxisRenderer,
             tickOptions:{formatString:"%b %#d '12"},
@@ -175,6 +175,9 @@ $(function() {
    
     window.TrackerView = Backbone.View.extend({
       
+        tagName: "div",
+        className: "tracker summary",
+        
         render: function() {
             $(this.el).html(this.template(this.model.toJSON()));
             return this;
@@ -215,9 +218,8 @@ $(function() {
             return this.modelsFromTable($("#grades"));
         },
         
-        resetFromGradesTable: function(data_element_sel) {
-            var models = this.modelsFromTable($(data_element_sel));
-            this.reset(models);
+        setModels: function(data_element_sel) {
+            this.add(this.modelsFromTable($(data_element_sel)));
        },
        
        url: function() {
@@ -227,26 +229,47 @@ $(function() {
 
     window.GradeListView = Backbone.View.extend({
  
+        tagName: "ul",
+        className: "grade_view_list",
+ 
         initialize:function () {
             this.model.bind("reset", this.render, this);
         },
  
         render:function (eventName) {
-            $(this.el).append("<ul>");
+            var el = this.$el;
             _.each(this.model.models, function (grade) {
-                $(this.el).append(new GradeListItemView({model:grade}).render().el);
+                el.append(new GradeListItemView({
+                    model: grade,
+                    id: grade.attributes.id
+                }).render().el);
             }, this);
-            $(this.el).append("<ul>");
             return this;
         }
         
     });
     
+    function setScoreBackground(jqel) {
+        // console.log($(".score", jqel));
+        var score_el = $(".score", jqel);
+        var score_num = parseInt(score_el.text(),10);
+        var range = 40,
+            halfrange = range/2;
+        var short = Math.min(100 - score_num, range);
+        var red = parseInt( (255/halfrange) * Math.min(20, short), 10);
+        var green = parseInt( 255 - (255/halfrange) * Math.max(0, short-halfrange), 10);
+        console.log("short: " + short + ", rgb("+ red + "," + green + ",0)");
+        score_el[0].style.cssText="background-color:rgb("+ red + "," + green + ",0)";
+    }
+    
     window.GradeListItemView = Backbone.View.extend({
+ 
+        tagName: 'li',
  
         template: _.template($('#tpl_grade_listing').html()),
         render:function (eventName) {
             $(this.el).html(this.template(this.model.toJSON()));
+            setScoreBackground(this.$el);
             return this;
         }
  
@@ -298,16 +321,20 @@ var AppRouter = Backbone.Router.extend({
         this.trackerView = new TrackerView({model:this.tracker});
         var trackerView = this.trackerView;
         $(".details", $("#binder_app")).remove();
+        $("#grades_chart", $("#binder_app")).remove();
         $("#binder_app").append($('<div class="details tracker"></div>'));
+        $("#binder_app").append($('<div id="grades_chart"></div>'));
         
         this.tracker.fetch({success: function(model, response) {
-            $(".details", $("#binder_app")).append(trackerView.render().el);
+            var details_column = $(".details", $("#binder_app"))
+            details_column.append(trackerView.render().el);
             model.grades = new GradeList();
             model.gradeListView = new GradeListView({model:model.grades});
-            model.grades.resetFromGradesTable('div#grades');
-            $(".details", $("#binder_app")).append(model.gradeListView.render().el);
+            model.grades.setModels('div#grades');
+            details_column.append(model.gradeListView.render().el);
+            var grades = model.gradeListView.model.toJSON();
+            processGrades(grades, "grades_chart");
         }});
-        
     }
 });
  
