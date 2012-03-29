@@ -334,7 +334,20 @@ $(function() {
     });
     
     window.GradeFormView = Backbone.View.extend({
-        
+       
+        form_data_sel: "form.grade_post",
+       
+        render: function(eventName) {
+            
+            var model_json = this.model.toJSON();
+            var form = $(this.form_data_sel);
+            this.$el.html(form.html());
+            $('[name]', this.$el).each(function(index,control) {
+                var control_name = control.name;
+                $(control).val(model_json[control_name]);
+            });
+            return this;
+        }
     });
    
     window.AddView = Backbone.View.extend({
@@ -346,7 +359,7 @@ $(function() {
         },
 
         render:function (eventName) {
-            $(this.el).html(this.template());
+            this.$el.html(this.template());
             return this;
         },
 
@@ -357,7 +370,7 @@ $(function() {
         newGrade:function (event) {
             if (app.gradeView) app.gradeView.close();
             app.gradeView = new GradeFormView({model:new Grade()});
-            $el.html(app.gradeView.render().el);
+            this.$el.html(app.gradeView.render().el);
             return false;
         }
     });
