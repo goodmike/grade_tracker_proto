@@ -117,8 +117,7 @@ $(function() {
             if (!this.fetch_details) {
                 return response;
             }
-            $("#primary_data").html($("div#tracker", $(response)));
-            $("#primary_data").append($("div#grades", $(response)));
+            $("#primary_data").html($("div.tracker-grades-block", $(response)));
             var tracker_el = $("li", $("div#tracker ul.single"));
             var new_model = {
                 data_url: $("a[rel=tracker]", tracker_el).attr("href"),
@@ -269,8 +268,7 @@ $(function() {
  
         render:function (eventName) {
             var el = this.$el;
-            var display_grades = this.model.models.slice();
-            display_grades.reverse(); // mutates array
+            var display_grades = this.model.models.slice().reverse();
             _.each(display_grades, function (grade) {
                 el.append(new GradeListItemView({
                     model: grade,
@@ -278,7 +276,23 @@ $(function() {
                 }).render().el);
             }, this);
             return this;
-        }
+        },
+        
+        saveGrade:function () {
+            this.model.set({
+                date:$('#grade_date').val(),
+                assessment:$('#grade_assessment').val(),
+                score:$('#grade_score').val(),
+                topic:$('#grade_topic').val(),
+                notes:$('#grade_notes').val()
+            });
+            if (this.model.isNew()) {
+                app.wineList.create(this.model);
+            } else {
+                this.model.save();
+            }
+            return false;
+        },
         
     });
     
@@ -317,7 +331,36 @@ $(function() {
         $(this.el).html(this.template(this.model.toJSON()));
         return this;
       }
-   });
+    });
+    
+    window.GradeFormView = Backbone.View.extend({
+        
+    });
+   
+    window.AddView = Backbone.View.extend({
+
+        template:_.template($('#tpl_add_view').html()),
+
+        initialize:function () {
+            this.render();
+        },
+
+        render:function (eventName) {
+            $(this.el).html(this.template());
+            return this;
+        },
+
+        events:{
+            "click .new":"newGrade"
+        },
+
+        newGrade:function (event) {
+            if (app.gradeView) app.gradeView.close();
+            app.gradeView = new GradeFormView({model:new Grade()});
+            $el.html(app.gradeView.render().el);
+            return false;
+        }
+    });
    
     window.AppView = Backbone.View.extend({
         
@@ -359,6 +402,8 @@ var AppRouter = Backbone.Router.extend({
         this.tracker.fetch({success: function(model, response) {
             var details_column = $(".details", $("#binder_app"))
             details_column.append(trackerView.render().el);
+            var add_view = new AddView();
+            details_column.append(add_view.render().el);
             model.grades = new GradeList();
             model.gradeListView = new GradeListView({model:model.grades});
             model.grades.setModels('div#grades');
