@@ -12,6 +12,21 @@ Backbone.sync = function(method, model, options) {
    originalSync.apply(Backbone, [ method, model, options ]);
 };
 
+var today = function() {
+    var d = new Date();
+    var curr_date = d.getDate();
+    if (curr_date < 10) {
+        curr_date = "0" + curr_date;
+    }
+    var curr_month = d.getMonth() + 1;
+    if (curr_month < 10) {
+        curr_month = "0" + curr_month;
+    }
+    var curr_year = d.getFullYear();
+    var date_string = "" + curr_year + "-" + curr_month + "-" + curr_date;
+    return function() { return date_string };
+}();
+
 var tableHeaders = function() {
     var headers = [].slice.apply(arguments);
     return "<tr>" + 
@@ -35,15 +50,12 @@ function processGrades(grades, chart_el_id) {
         var w = parseInt(grade.weight,10);
         if (i===0) return [{"date": d, "points": p, "weight": w}];
         var last = memo[i-1];
-        console.log(last);
         memo.push({"date": d, "points": p + last.points, "weight": w + last.weight});
         return memo;
     }, []);
     var running_avg_line = _.map(running_avg_points, function(point) {
         return [point.date, point.points/point.weight];
     });
-
-    console.log(running_avg_line);
     
     function labelDate(grade_date) {
         var m_names = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
@@ -198,7 +210,15 @@ $(function() {
     });
         
     window.Grade = Backbone.Model.extend({
-
+        
+        defaults:{
+            "id":null,
+            "date":today(),
+            "assessment":"homework",
+            "score":null,
+            "topic":"",
+            "notes":""
+        }
     });
    
     window.GradeList = Backbone.Collection.extend({
@@ -245,11 +265,13 @@ $(function() {
  
         initialize:function () {
             this.model.bind("reset", this.render, this);
-        },
+        }, 
  
         render:function (eventName) {
             var el = this.$el;
-            _.each(this.model.models, function (grade) {
+            var display_grades = this.model.models.slice();
+            display_grades.reverse(); // mutates array
+            _.each(display_grades, function (grade) {
                 el.append(new GradeListItemView({
                     model: grade,
                     id: grade.attributes.id
@@ -261,7 +283,6 @@ $(function() {
     });
     
     function setScoreBackground(jqel) {
-        // console.log($(".score", jqel));
         var score_el = $(".score", jqel);
         var score_num = parseInt(score_el.text(),10);
         var range = 40,
@@ -269,7 +290,6 @@ $(function() {
         var short = Math.min(100 - score_num, range);
         var red = parseInt( (255/halfrange) * Math.min(20, short), 10);
         var green = parseInt( 255 - (255/halfrange) * Math.max(0, short-halfrange), 10);
-        console.log("short: " + short + ", rgb("+ red + "," + green + ",0)");
         score_el[0].style.cssText="background-color:rgb("+ red + "," + green + ",0)";
     }
     

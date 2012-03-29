@@ -54,6 +54,21 @@ function acceptsXml(req) {
     return contentType;
 }
 
+var today = function() {
+    var d = new Date();
+    var curr_date = d.getDate();
+    if (curr_date < 10) {
+        curr_date = "0" + curr_date;
+    }
+    var curr_month = d.getMonth() + 1;
+    if (curr_month < 10) {
+        curr_month = "0" + curr_month;
+    }
+    var curr_year = d.getFullYear();
+    var date_string = "" + curr_year + "-" + curr_month + "-" + curr_date;
+    return function() { return date_string };
+}();
+
 // for couch
 var host = 'https://goodmike.cloudant.com'
   , port = 443
@@ -174,11 +189,37 @@ app.get(baseHtmlUrl + 'trackers/:i', function(req,res) {
           title: id,
           items: rows.grades,
           tracker: rows.tracker,
+          create_url: baseHtmlUrl + "trackers/" + id + '/grades',
           site: baseHtmlUrl
        });
    });
 });
 
+/* POST new grade to tracker */
+app.post(baseHtmlUrl + 'trackers/:i/grades', function(req,res) {
+
+    var grade = {
+        type: 'grade',
+        score: req.body.score,
+        date: req.body.date,
+        topic: req.body.topic,
+        assessment: req.body.assessment,
+        notes: req.body.notes,
+        tracker_id: req.params.i,
+        dateCreated: today()
+    };
+       
+    // write to DB
+    db.save(grade, function(err, doc) {
+        if(err) {
+           res.status=400;
+           res.send(err);
+           return; // just for clarity
+        } else {
+           res.redirect(baseHtmlUrl + 'trackers/' + req.params.i, 302);
+        }
+    });
+});
 
 // JSON for backbone integration phase 1
 app.get('/grades', function(req, res) {
