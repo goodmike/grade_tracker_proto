@@ -28,22 +28,24 @@ var today = function() {
     return function() { return date_string };
 }();
 
-var tableHeaders = function() {
-    var headers = [].slice.apply(arguments);
-    return "<tr>" + 
-        headers.map(function(hdr) { 
-            return "<th>" + hdr + "</th>"
-        }).join("\n") + 
-    "</tr>";
-};
-
-function processGrades(grades, chart_el_id) {
+function processGrades(tracker_model, chart_el_id) {
+    
+    var grades = tracker_model.grades;
+    var tracker = tracker_model.toJSON();
+    
+    var start_date = tracker.start_date + " 12:00 PM";
+    var end_date   = tracker.end_date + " 12:00 PM";
+    var goal_score = parseInt(tracker.goal, 10);
+    
+    var ms_per_week = 1000 * 3600 * 24 * 7;
+    var weeks = (new Date(end_date) - new Date(start_date)) / ms_per_week;
+    var week_scale = parseInt(weeks/6) + 1;
     
     var gradesline = _.map(grades, function(grade) {
         return [grade.date + " 12:00PM", parseInt(grade.score, 10)];
     });
            
-    var targetline = [["2012-01-23 12:00AM", 88],['2012-03-12 12:00AM', 88]];
+    var targetline = [[start_date, goal_score],[end_date, goal_score]];
 
     var running_avg_points = _.reduce(grades, function(memo, grade, i) {
         var d = grade.date + " 12:00PM";
@@ -78,7 +80,7 @@ function processGrades(grades, chart_el_id) {
             tickOptions:{formatString:"%b %#d '12"},
             min: labelDate(grades[0].date),
             max: labelDate(grades[grades.length-1].date),
-            tickInterval:'1 week'
+            tickInterval: week_scale + ' week'
         }
     },
     fillBetween: {
@@ -428,16 +430,16 @@ var AppRouter = Backbone.Router.extend({
         $("#binder_app").append($('<div id="grades_chart"></div>'));
         
         this.tracker.fetch({success: function(model, response) {
-            var details_column = $(".details", $("#binder_app"))
+            var details_column = $(".details", $("#binder_app"));
             details_column.append(trackerView.render().el);
             var add_view = new AddView();
             details_column.append(add_view.render().el);
             app.grades = new GradeList({tracker:app.tracker});
+            app.grades.reset().setModels('div#grades');
             app.gradeListView = new GradeListView({model:app.grades});
-            app.grades.setModels('div#grades');
             details_column.append(app.gradeListView.render().el);
-            var grades = app.gradeListView.model.toJSON();
-            processGrades(grades, "grades_chart");
+            model.grades = app.gradeListView.model.toJSON();
+            processGrades(model, "grades_chart");
         }});
     }
 });
