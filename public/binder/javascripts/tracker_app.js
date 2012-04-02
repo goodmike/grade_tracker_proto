@@ -12,7 +12,6 @@ Backbone.sync = function(method, model, options) {
 };
 
 Backbone.emulateJSON = true;
-// Backbone.emulateHTTP = true;
 
 var today = function() {
     var d = new Date();
