@@ -32,6 +32,25 @@
         .data {
             display:none;    
         }
+        #modal {
+            position:absolute;
+            top:100px; left:200px;
+            width:200px;
+            background-color:white;
+            margin:0 auto;
+            padding:30px;
+            border-radius: 5px;
+            border: 2px solid #999999;
+            display:none;
+        }
+        #modal .controls * {
+            display: block;
+            width: 200px;
+            margin-bottom: 1em;
+        }
+        #modal .controls LABEL {
+            margin-bottom: 0em;
+        }
         ol, ul {
           list-style: none;
         }
@@ -65,7 +84,11 @@
             padding: 10px 15px 10px 10px;
             border-bottom: 1px solid #cccccc;   
         }
-        
+        div#add_grade {
+            padding: 1em;
+            text-align: center;
+            border-bottom: 1px solid lightgray;
+        }
         ul.grade_view_list {
             margin:0;
             padding:0;
@@ -117,6 +140,7 @@
   </head>
   <body>
     <div id="binder_app"></div>
+    <div id="modal"></div>
     <div id="primary_data" class="data"></div>
     <div id="secondary_data" class="data"></div>
     
@@ -135,7 +159,7 @@
     </style>
     
     <style type="text/template" id="tpl_add_view">
-        <button class="new">New Wine</button>
+        <button class="new">New Grade</button>
     </style>
     
   </body>

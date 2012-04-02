@@ -198,6 +198,15 @@ app.get(baseHtmlUrl + 'trackers/:i', function(req,res) {
 /* POST new grade to tracker */
 app.post(baseHtmlUrl + 'trackers/:i/grades', function(req,res) {
 
+    console.log("request headers:");
+    for (k in req.headers) {
+        console.log(k + ": " + req.headers[k]);   
+    }
+    console.log("request body:");
+    console.log("body length? " + req.body.length);
+    for (k in req.body) {
+        console.log(k + ": " + req.body[k]);   
+    }
     var grade = {
         type: 'grade',
         score: req.body.score,
@@ -216,7 +225,8 @@ app.post(baseHtmlUrl + 'trackers/:i/grades', function(req,res) {
            res.send(err);
            return; // just for clarity
         } else {
-           res.redirect(baseHtmlUrl + 'trackers/' + req.params.i, 302);
+            console.log("saved grade. doc._id=" + doc._id);
+            res.redirect(baseHtmlUrl + 'trackers/' + req.params.i, 302);
         }
     });
 });

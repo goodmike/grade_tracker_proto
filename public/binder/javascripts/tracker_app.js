@@ -2,15 +2,17 @@ var originalSync = Backbone.sync;
 
 Backbone.sync = function(method, model, options) {
 
-   // Default JSON-request options.
+   // Override JSON-request options.
    var params = _.extend(options, {
-     contentType:  'text/html',
      dataType:     'html',
-     processData:  false
+     data: $.param(model.toJSON())
    });
    
-   originalSync.apply(Backbone, [ method, model, options ]);
+   originalSync.apply(Backbone, [ method, model, params ]);
 };
+
+Backbone.emulateJSON = true;
+// Backbone.emulateHTTP = true;
 
 var today = function() {
     var d = new Date();
@@ -224,6 +226,10 @@ $(function() {
        
         model: Grade,
 
+        initialize: function(attributes) {
+            this.tracker = attributes.tracker;
+        },
+
         modelsFromTable: function(data) {
             var cols = _.pluck($("col", data), 'className');
             var rows = $("tr", data).slice(1);
@@ -253,7 +259,7 @@ $(function() {
        },
        
        url: function() {
-           return this.tracker.url + "/grades";
+           return this.tracker.url() + "/grades";
        }
    });
 
@@ -276,23 +282,7 @@ $(function() {
                 }).render().el);
             }, this);
             return this;
-        },
-        
-        saveGrade:function () {
-            this.model.set({
-                date:$('#grade_date').val(),
-                assessment:$('#grade_assessment').val(),
-                score:$('#grade_score').val(),
-                topic:$('#grade_topic').val(),
-                notes:$('#grade_notes').val()
-            });
-            if (this.model.isNew()) {
-                app.wineList.create(this.model);
-            } else {
-                this.model.save();
-            }
-            return false;
-        },
+        }
         
     });
     
@@ -336,6 +326,7 @@ $(function() {
     window.GradeFormView = Backbone.View.extend({
        
         form_data_sel: "form.grade_post",
+        className: "controls",
        
         render: function(eventName) {
             
@@ -347,12 +338,36 @@ $(function() {
                 $(control).val(model_json[control_name]);
             });
             return this;
-        }
+        },
+        
+        
+        events:{
+            "click .save":"saveGrade",
+        },
+
+        saveGrade:function () {
+            this.model.set({
+                date:$('#grade_date').val(),
+                assessment:$('#grade_assessment').val(),
+                score:$('#grade_score').val(),
+                topic:$('#grade_topic').val(),
+                notes:$('#grade_notes').val()
+            });
+            if (this.model.isNew()) {
+                app.grades.create(this.model);
+            } else {
+                this.model.save();
+            }
+            return false;
+        },
     });
    
     window.AddView = Backbone.View.extend({
 
         template:_.template($('#tpl_add_view').html()),
+        
+        tagName: "div",
+        id: "add_grade",
 
         initialize:function () {
             this.render();
@@ -370,7 +385,8 @@ $(function() {
         newGrade:function (event) {
             if (app.gradeView) app.gradeView.close();
             app.gradeView = new GradeFormView({model:new Grade()});
-            this.$el.html(app.gradeView.render().el);
+            $("#modal").html(app.gradeView.render().el);
+            $("#modal").show();
             return false;
         }
     });
@@ -417,11 +433,11 @@ var AppRouter = Backbone.Router.extend({
             details_column.append(trackerView.render().el);
             var add_view = new AddView();
             details_column.append(add_view.render().el);
-            model.grades = new GradeList();
-            model.gradeListView = new GradeListView({model:model.grades});
-            model.grades.setModels('div#grades');
-            details_column.append(model.gradeListView.render().el);
-            var grades = model.gradeListView.model.toJSON();
+            app.grades = new GradeList({tracker:app.tracker});
+            app.gradeListView = new GradeListView({model:app.grades});
+            app.grades.setModels('div#grades');
+            details_column.append(app.gradeListView.render().el);
+            var grades = app.gradeListView.model.toJSON();
             processGrades(grades, "grades_chart");
         }});
     }
