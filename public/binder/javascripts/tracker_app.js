@@ -231,6 +231,8 @@ $(function() {
             this.tracker = attributes.tracker;
         },
 
+        // comparator function for auto-sorting?
+
         modelsFromTable: function(data) {
             var cols = _.pluck($("col", data), 'className');
             var rows = $("tr", data).slice(1);
@@ -370,6 +372,7 @@ $(function() {
             );
             if (this.model.isNew()) {
                 app.grades.create(this.model, {
+                    wait: true,
                     success: function(model, response) {
                         var weighted_score = model.attributes.score; // will come from response
                         model.set({weighted_score: model.attributes.score});
