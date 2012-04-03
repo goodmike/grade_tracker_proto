@@ -368,13 +368,13 @@ $(function() {
                 notes:$('#grade_notes').val()
             });
             if (this.model.isNew()) {
-                app.grades.create(this.model);
-            } else {
-                this.model.save({
+                app.grades.create(this.model{
                     success: function(model, response) {
                         model.weighted_score = model.score;
                     }
                 });
+            } else {
+                this.model.save();
             }
             return false;
         },
