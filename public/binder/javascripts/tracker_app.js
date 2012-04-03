@@ -377,8 +377,9 @@ $(function() {
                 app.grades.create(this.model, {
                     silent: true,
                     success: function(model, response) {
-                        var weighted_score = model.attributes.score; // will come from response
-                        model.set({weighted_score: model.attributes.score});
+                        var weighted_score = model.attributes.score,
+                            weight = 1; // will come from response
+                        model.set({"weighted_score": model.attributes.score, "weight": weight});
                         app.grades.trigger("add",model); // now go add grade and redraw chart
                     }
                 });
