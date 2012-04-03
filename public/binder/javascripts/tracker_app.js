@@ -108,6 +108,9 @@ function processGrades(tracker, grades, chart_el_id) {
 var binderUrl = "/binder/";
 var httpAPIUrl = "/html/";
 
+
+var app = {};
+
 $(function() {
    
     window.Tracker = Backbone.Model.extend({
@@ -474,7 +477,7 @@ var AppRouter = Backbone.Router.extend({
     }
 });
  
-    var app = new AppRouter();
+    app = new AppRouter();
     Backbone.history.start();
 
 });
