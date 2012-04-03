@@ -368,7 +368,7 @@ $(function() {
                 notes:$('#grade_notes').val()
             });
             if (this.model.isNew()) {
-                app.grades.create(this.model{
+                app.grades.create(this.model, {
                     success: function(model, response) {
                         model.weighted_score = model.score;
                     }
