@@ -366,11 +366,13 @@ $(function() {
                 score:$('#grade_score').val(),
                 topic:$('#grade_topic').val(),
                 notes:$('#grade_notes').val()
-            });
+                }, {silent: true}
+            );
             if (this.model.isNew()) {
                 app.grades.create(this.model, {
                     success: function(model, response) {
-                        model.weighted_score = model.score;
+                        var weighted_score = model.attributes.score; // will come from response
+                        model.set({weighted_score: = model.attributes.score;});
                     }
                 });
             } else {
