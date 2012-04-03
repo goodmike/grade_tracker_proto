@@ -379,7 +379,7 @@ $(function() {
                     success: function(model, response) {
                         var weighted_score = model.attributes.score; // will come from response
                         model.set({weighted_score: model.attributes.score});
-                        model.change(); // now go add grade and redraw chart
+                        app.grades.trigger("add",model); // now go add grade and redraw chart
                     }
                 });
             } else {
