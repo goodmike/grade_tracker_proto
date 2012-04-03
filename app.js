@@ -225,7 +225,7 @@ app.post(baseHtmlUrl + 'trackers/:i/grades', function(req,res) {
            res.send(err);
            return; // just for clarity
         } else {
-            // render grade page with link to tracker.
+            //  res.render('grade/show', { status: 201 });
             res.send('created', { 'Content-Type': 'text/plain' }, 201);
         }
     });

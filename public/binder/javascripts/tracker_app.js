@@ -3,10 +3,13 @@ var originalSync = Backbone.sync;
 Backbone.sync = function(method, model, options) {
 
    // Override JSON-request options.
-   var params = _.extend(options, {
-     dataType:     'html',
-     data: $.param(model.toJSON())
-   });
+   var extensions = {
+       dataType:     'html',
+   };
+   if (method !== "read") {
+        extensions.data = $.param(model.toJSON());
+   }
+   var params = _.extend(options, extensions);
    
    originalSync.apply(Backbone, [ method, model, params ]);
 };
@@ -28,10 +31,7 @@ var today = function() {
     return function() { return date_string };
 }();
 
-function processGrades(tracker_model, chart_el_id) {
-    
-    var grades = tracker_model.grades;
-    var tracker = tracker_model.toJSON();
+function processGrades(tracker, grades, chart_el_id) {
     
     var start_date = tracker.start_date + " 12:00 PM";
     var end_date   = tracker.end_date + " 12:00 PM";
@@ -269,7 +269,9 @@ $(function() {
         tagName: "ul",
         className: "grade_view_list",
  
-        initialize:function () {
+        initialize:function (opts) {
+            this.model = opts.model;
+            this.tracker = opts.tracker;
             this.model.bind("reset", this.render, this);
             var view = this;
             this.model.bind("add", function (grade) {
@@ -280,10 +282,8 @@ $(function() {
         }, 
  
         drawChart: function() {
-            processGrades(this.model.toJSON());
+            processGrades(this.tracker.toJSON(), this.model.toJSON(), "grades_chart");
         },
-        //            model.grades = app.gradeListView.model.toJSON();
-        //            processGrades(model, "grades_chart");
  
         render:function (eventName) {
             this.drawChart();
@@ -370,7 +370,11 @@ $(function() {
             if (this.model.isNew()) {
                 app.grades.create(this.model);
             } else {
-                this.model.save();
+                this.model.save({
+                    success: function(model, response) {
+                        model.weighted_score = model.score;
+                    }
+                });
             }
             return false;
         },
@@ -454,7 +458,10 @@ var AppRouter = Backbone.Router.extend({
             details_column.append(add_view.render().el);
             app.grades = new GradeList({tracker:app.tracker});
             app.grades.reset().setModels('div#grades');
-            app.gradeListView = new GradeListView({model:app.grades});
+            app.gradeListView = new GradeListView({
+                model:app.grades,
+                tracker:model    
+            });
             details_column.append(app.gradeListView.render().el);
 //            model.grades = app.gradeListView.model.toJSON();
 //            processGrades(model, "grades_chart");
