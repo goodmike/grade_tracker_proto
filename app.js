@@ -225,8 +225,8 @@ app.post(baseHtmlUrl + 'trackers/:i/grades', function(req,res) {
            res.send(err);
            return; // just for clarity
         } else {
-            console.log("saved grade. doc._id=" + doc._id);
-            res.redirect(baseHtmlUrl + 'trackers/' + req.params.i, 302);
+            // render grade page with link to tracker.
+            res.send('created', { 'Content-Type': 'text/plain' }, 201);
         }
     });
 });

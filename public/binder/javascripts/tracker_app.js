@@ -78,8 +78,8 @@ function processGrades(tracker_model, chart_el_id) {
         xaxis:{
             renderer:$.jqplot.DateAxisRenderer,
             tickOptions:{formatString:"%b %#d '12"},
-            min: labelDate(grades[0].date),
-            max: labelDate(grades[grades.length-1].date),
+            min: labelDate(tracker.start_date),
+            max: labelDate(tracker.end_date),
             tickInterval: week_scale + ' week'
         }
     },
@@ -271,9 +271,22 @@ $(function() {
  
         initialize:function () {
             this.model.bind("reset", this.render, this);
+            var view = this;
+            this.model.bind("add", function (grade) {
+                $(view.el).prepend(new GradeListItemView({model:grade}).render().el);
+                $("#modal").hide();
+                view.drawChart();
+            });
         }, 
  
+        drawChart: function() {
+            processGrades(this.model.toJSON());
+        },
+        //            model.grades = app.gradeListView.model.toJSON();
+        //            processGrades(model, "grades_chart");
+ 
         render:function (eventName) {
+            this.drawChart();
             var el = this.$el;
             var display_grades = this.model.models.slice().reverse();
             _.each(display_grades, function (grade) {
@@ -361,6 +374,11 @@ $(function() {
             }
             return false;
         },
+        
+        close:function () {
+            this.$el.unbind();
+            this.$el.empty();
+        }
     });
    
     window.AddView = Backbone.View.extend({
@@ -438,8 +456,8 @@ var AppRouter = Backbone.Router.extend({
             app.grades.reset().setModels('div#grades');
             app.gradeListView = new GradeListView({model:app.grades});
             details_column.append(app.gradeListView.render().el);
-            model.grades = app.gradeListView.model.toJSON();
-            processGrades(model, "grades_chart");
+//            model.grades = app.gradeListView.model.toJSON();
+//            processGrades(model, "grades_chart");
         }});
     }
 });
